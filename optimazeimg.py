@@ -22,6 +22,9 @@ def compress_image(input_path, max_width=1000, max_size=256, step=2):
 
         # Изменение размера изображения
         img = img.resize((w, h), Image.LANCZOS)
+        
+        if img.mode in ('P', 'RGBA'):
+            img = img.convert('RGB')
 
         # Сохранение изображение с пониженным качеством
         while quality >= step and os.path.getsize(input_path) > max_size * 256:
@@ -30,10 +33,11 @@ def compress_image(input_path, max_width=1000, max_size=256, step=2):
         print(f"Сжатие и сохранение {input_path}")
 
 def compress_images_in_directory(directory_path):
-    for filename in os.listdir(directory_path):
-        if filename.endswith(('.jpg', '.jpeg', '.png')):
-            input_path = os.path.join(directory_path, filename)
-            compress_image(input_path)
+    for root, _, files in os.walk(directory_path):
+        for filename in files:
+            if filename.endswith(('.jpg', '.jpeg', '.png')):
+                input_path = os.path.join(root, filename)
+                compress_image(input_path)
 
 if __name__ == "__main__":
     directory_path = input("Укажи путь к каталогу, содержащему изображения: ")
